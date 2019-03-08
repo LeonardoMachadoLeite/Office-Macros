@@ -1,0 +1,40 @@
+Sub mala_docs_ind()
+'
+' mala_docs_ind Macro
+'
+
+    Dim DokName  As String   'ADDED CODE
+
+    'Used to set criteria for moving through the document by section.
+    Application.Browser.Target = wdBrowseSection
+
+    ActiveDocument.MailMerge.DataSource.ActiveRecord = ActiveDocument.MailMerge.DataSource.FirstRecord
+
+    'A mailmerge document ends with a section break next page.
+    'Subtracting one from the section count stop error message.
+    For i = 1 To ((ActiveDocument.Sections.Count) - 1)
+
+        ' Remember the wanted documentname
+        DokName = ActiveDocument.MailMerge.DataSource.DataFields("Nome").Value         ' ADDED CODE
+
+        'Select and copy the section text to the clipboard
+        ActiveDocument.Bookmarks("\Section").Range.Copy
+
+        'Create a new document to paste text from clipboard.
+        Documents.Add
+        Selection.PasteAndFormat wdFormatOriginalFormatting
+
+        ChangeFileOpenDirectory "C:\Users\leoml\Documents\Leonardo\Testes Office"
+        
+        ActiveDocument.SaveAs FileName:=DokName & ".doc"
+        ActiveDocument.Close
+        
+        ' Now, back in the template document, advance to next record
+        ActiveDocument.MailMerge.DataSource.ActiveRecord = wdNextRecord
+        
+        'Move the selection to the next section in the document
+        Application.Browser.Next
+    Next i
+    'ActiveDocument.Close savechanges:=wdDoNotSaveChange
+
+End Sub
